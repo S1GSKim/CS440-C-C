@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/cs440'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost:3306/cs440'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -30,7 +30,7 @@ class Decrypt(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     decrypt_key = db.Column(db.VARCHAR(500))
-    email = db.Column(db.VARCHAR(1000))
+    email = db.Column(db.VARCHAR(500))
 
     def __init__(self, decrypt_key, email):
         self.decrypt_key = decrypt_key
@@ -171,4 +171,4 @@ def addDecryptKey(decrypt_key, email):
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
