@@ -25,6 +25,22 @@ class Status(db.Model):
         return {"id": self.id, "status": self.status}
 
 
+class Decrypt(db.Model):
+    __tablename__ = 'decrypt'
+
+    id = db.Column(db.Integer, primary_key=True)
+    decrypt_key = db.Column(db.VARCHAR(500))
+    email = db.Column(db.VARCHAR(1000))
+
+    def __init__(self, decrypt_key, email):
+        self.decrypt_key = decrypt_key
+        self.email = email
+
+    def json(self):
+        return {"id": self.id, "decrypt_key": self.decrypt_key, "email": self.email}
+
+
+# STATUS
 @app.route("/get_status/<int:id>")
 def getStatus(id):
     status = Status.query.filter_by(id=id).first()
@@ -115,6 +131,41 @@ def changeStatus(id):
         {
             "code": 201,
             "data": status.json()
+        }
+    ), 201
+
+
+# DECRYPT
+@app.route("/get_decrypt/<string:email>")
+def getDecryptKey(email):
+    decrypt = Decrypt.query.filter_by(email=email).first()
+    if decrypt:
+        return decrypt.json()['decrypt_key']
+
+
+@app.route("/add_decrypt/<string:decrypt_key>/<string:email>", methods=['POST'])
+def addDecryptKey(decrypt_key, email):
+    decrypt_key = Decrypt(decrypt_key=decrypt_key,
+                          email=email)
+
+    try:
+        db.session.add(decrypt_key)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "code": 500,
+                "data": {
+                    "id": id
+                },
+                "message": "An error occurred decrypt."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "code": 201,
+            "data": decrypt_key.json()
         }
     ), 201
 
